@@ -1,11 +1,13 @@
 #See https://aka.ms/containerfastmode to understand how Visual Studio uses this Dockerfile to build your images for faster debugging.
 
-FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS base
+#FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS base
+FROM dotnet/dotnet-runtime:7.0-ubi8 AS base
 WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 
-FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
+#FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
+FROM dotnet/dotnet:7.0-ubi8 AS build
 WORKDIR /app
 COPY . .
 #COPY ["src/PublicApi/PublicApi.csproj", "./PublicApi/"]
@@ -16,10 +18,11 @@ RUN dotnet restore
 
 RUN dotnet build "./PublicApi.csproj" -c Release -o /app/build
 
-FROM build AS publish
+#FROM build AS publish
 RUN dotnet publish "./PublicApi.csproj" -c Release -o /app/publish
 
-FROM base AS final
+#FROM base AS final
+FROM dotnet/dotnet-runtime:7.0-ubi8 AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "PublicApi.dll"]
